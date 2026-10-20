@@ -43,6 +43,12 @@ main {
 }
 h1 { font-size: 2rem; margin-bottom: 1rem; }
 
+/* Tours */
+.tours { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.tours li { padding: 1rem 1.25rem; border: 1px solid #d1d5db; border-radius: 6px; }
+.tours h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+.tours a { color: var(--color-primary); }
+
 /* Form */
 form { display: flex; flex-direction: column; gap: 0.75rem; max-width: 480px; }
 label { font-weight: 600; }

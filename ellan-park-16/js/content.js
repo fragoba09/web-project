@@ -8,13 +8,7 @@ export const PROPERTY = {
   facts: ['Semi-detached', '3 bedrooms', '1 bathroom', '961 ft² · 89.5 m²'],
   source: 'https://koopsandco.com/property/ellan-park-ramsey-im8/',
   agent: 'Koops & Co',
-};
-
-export const PROVENANCE = {
-  plan: { label: 'Floor plan', hint: 'Position or size taken from the floor plan' },
-  listing: { label: 'Listing', hint: 'Named in the listing description' },
-  photo: { label: 'Photos', hint: 'Seen in the listing photos' },
-  inferred: { label: 'Inferred', hint: 'Not shown in the listing; filled in by reasoning' },
+  related: [{ label: 'Also on Ellan Park: No. 22', href: '../ellan-park-22/' }],
 };
 
 const room = (id, room, title, az, extra) => ({ id, kind: 'room', room, title, az, el: 36, ...extra });

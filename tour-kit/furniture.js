@@ -205,13 +205,19 @@ export function desk(w, d) {
   return g;
 }
 
-export function dressingTable(w, d) {
+export function dressingTable(w, d, o = {}) {
+  const { lit = true, body = 'white', top = '#f1f0ee' } = o;
   const { g, x0, x1, z0, z1 } = frame(w, d);
   for (const [x, z] of [[x0 + 0.03, z0 + 0.03], [x1 - 0.06, z0 + 0.03], [x0 + 0.03, z1 - 0.06], [x1 - 0.06, z1 - 0.06]]) {
-    g.add(box(x, 0, z, x + 0.03, 0.72, z + 0.03, '#d8d6d1'));
+    g.add(box(x, 0, z, x + 0.03, 0.72, z + 0.03, lit ? '#d8d6d1' : 'silver'));
   }
-  g.add(box(x0, 0.6, z0, x1, 0.72, z1, 'white'));
-  g.add(box(x0, 0.72, z0, x1, 0.76, z1, '#f1f0ee'));
+  g.add(box(x0, 0.6, z0, x1, 0.72, z1, body));
+  g.add(box(x0, 0.72, z0, x1, 0.76, z1, top));
+  if (!lit) {
+    g.add(box(x0 + 0.1, 0.62, z1, x1 - 0.1, 0.7, z1 + 0.005, 'silver'));
+    g.add(box(-0.2, 0.76, z0 + 0.05, 0.2, 0.86, z0 + 0.18, '#f4f1ec'));
+    return g;
+  }
   g.add(box(-0.22, 0.76, z0 + 0.04, 0.22, 1.18, z0 + 0.07, 'white'));
   g.add(box(-0.19, 0.79, z0 + 0.07, 0.19, 1.15, z0 + 0.075, 'mirror'));
   for (let i = 0; i < 5; i++) {
@@ -297,7 +303,8 @@ export function worktop(w, d) {
 }
 
 export function wallUnits(w, d, o = {}) {
-  const { door = 'cream', panel = 'creamPanel', h = 0.72, n = Math.max(1, Math.round(w / 0.5)) } = o;
+  const { door = 'cream', h = 0.72, n = Math.max(1, Math.round(w / 0.5)), glazed = false, light = true } = o;
+  const panel = glazed ? 'blackGlass' : o.panel ?? 'creamPanel';
   const { g, x0, x1, z0, z1 } = frame(w, d);
   g.add(box(x0, 0, z0, x1, h, z1 - 0.02, door));
   const dw = w / n;
@@ -307,7 +314,7 @@ export function wallUnits(w, d, o = {}) {
     g.add(box(a + 0.06, 0.06, z1 - 0.02, b - 0.06, h - 0.06, z1 - 0.012, panel));
     g.add(box(cx - 0.05, 0.08, z1 - 0.012, cx + 0.05, 0.095, z1 + 0.01, 'chrome'));
   }
-  g.add(box(x0 + 0.05, -0.012, z1 - 0.1, x1 - 0.05, 0, z1 - 0.06, 'warmLight'));
+  if (light) g.add(box(x0 + 0.05, -0.012, z1 - 0.1, x1 - 0.05, 0, z1 - 0.06, 'warmLight'));
   return g;
 }
 
@@ -337,9 +344,9 @@ export function rangeCooker(w, d) {
 
 // Black glass splashback plus a chimney hood; mounted on the wall behind the range.
 export function hood(w, d, o = {}) {
-  const { flue = 0.8 } = o;
+  const { flue = 0.8, splash = 'blackGlass' } = o;
   const { g, x0, x1, z0 } = frame(w, d);
-  g.add(box(x0, 0, z0, x1, 0.62, z0 + 0.012, 'blackGlass'));
+  if (splash) g.add(box(x0, 0, z0, x1, 0.62, z0 + 0.012, splash));
   g.add(box(x0 + 0.05, 0.72, z0, x1 - 0.05, 0.84, z0 + 0.5, 'steel'));
   g.add(box(-0.15, 0.84, z0, 0.15, 0.84 + flue, z0 + 0.26, 'steel'));
   return g;
@@ -368,16 +375,24 @@ export function washer(w, d, o = {}) {
 
 // Base units with a stainless inset sink; the lounge side gets a counter-height upstand.
 export function sinkRun(w, d, o = {}) {
-  const { sinkAt = 0, upstand = 1.06 } = o;
-  const g = baseUnits(w, d, { upstand, n: Math.max(2, Math.round(w / 0.5)) });
+  const { sinkAt = 0, upstand = 1.06, ceramic = false, tap = 'chrome', units = {} } = o;
+  const g = baseUnits(w, d, { upstand, n: Math.max(2, Math.round(w / 0.5)), ...units });
   const h = 0.9, z0 = -d / 2;
   const cx = sinkAt;
-  g.add(box(cx - 0.24, h - 0.005, -0.21, cx + 0.24, h + 0.004, 0.2, 'steel'));
-  g.add(box(cx - 0.2, h - 0.002, -0.17, cx + 0.2, h + 0.006, 0.16, '#878c90'));
-  g.add(box(cx + 0.26, h, -0.2, cx + 0.62, h + 0.006, 0.2, 'steel'));
-  for (let i = 0; i < 5; i++) g.add(box(cx + 0.3, h + 0.006, -0.16 + i * 0.075, cx + 0.58, h + 0.009, -0.15 + i * 0.075, '#a7abae'));
-  g.add(cyl(cx, h, z0 + 0.07, 0.022, 0.32, 'chrome'));
-  g.add(rod([cx, h + 0.32, z0 + 0.07], [cx, h + 0.3, z0 + 0.27], 0.014, 'chrome'));
+  if (ceramic) {
+    // White ceramic one-and-a-half bowl sink with a ribbed drainer.
+    g.add(box(cx - 0.3, h - 0.04, -0.23, cx + 0.62, h + 0.03, 0.22, 'porcelain'));
+    g.add(box(cx - 0.26, h - 0.02, -0.19, cx - 0.01, h + 0.032, 0.17, '#e3e8ea'));
+    g.add(box(cx + 0.03, h - 0.02, -0.19, cx + 0.2, h + 0.032, 0.17, '#e3e8ea'));
+    for (let i = 0; i < 5; i++) g.add(box(cx + 0.25, h + 0.03, -0.17 + i * 0.075, cx + 0.58, h + 0.036, -0.16 + i * 0.075, '#e8e8e5'));
+  } else {
+    g.add(box(cx - 0.24, h - 0.005, -0.21, cx + 0.24, h + 0.004, 0.2, 'steel'));
+    g.add(box(cx - 0.2, h - 0.002, -0.17, cx + 0.2, h + 0.006, 0.16, '#878c90'));
+    g.add(box(cx + 0.26, h, -0.2, cx + 0.62, h + 0.006, 0.2, 'steel'));
+    for (let i = 0; i < 5; i++) g.add(box(cx + 0.3, h + 0.006, -0.16 + i * 0.075, cx + 0.58, h + 0.009, -0.15 + i * 0.075, '#a7abae'));
+  }
+  g.add(cyl(cx, h, z0 + 0.07, 0.022, 0.32, tap));
+  g.add(rod([cx, h + 0.32, z0 + 0.07], [cx, h + 0.3, z0 + 0.27], 0.014, tap));
   return g;
 }
 
@@ -802,12 +817,15 @@ export function balustrade(w, d, o = {}) {
 // Outdoors
 // ---------------------------------------------------------------------------
 
-export function tubChair(w, d) {
+export function tubChair(w, d, o = {}) {
+  const { c = 'rattan', cushion = '#d8d0c2', legs = null } = o;
   const { g, x0, x1, z0, z1 } = frame(w, d);
-  g.add(box(x0 + 0.04, 0, z0 + 0.04, x1 - 0.04, 0.4, z1 - 0.04, 'rattan'));
-  g.add(box(x0, 0.4, z0, x1, 0.82, z0 + 0.12, 'rattan'));
-  g.add(box(x0, 0.4, z0, x0 + 0.1, 0.65, z1, 'rattan'), box(x1 - 0.1, 0.4, z0, x1, 0.65, z1, 'rattan'));
-  g.add(box(x0 + 0.1, 0.4, z0 + 0.12, x1 - 0.1, 0.48, z1 - 0.02, '#d8d0c2'));
+  const lift = legs ? 0.14 : 0;
+  if (legs) for (const [x, z] of [[x0 + 0.08, z0 + 0.08], [x1 - 0.08, z0 + 0.08], [x0 + 0.08, z1 - 0.08], [x1 - 0.08, z1 - 0.08]]) g.add(cyl(x, 0, z, 0.015, lift, legs, 8));
+  g.add(box(x0 + 0.04, lift, z0 + 0.04, x1 - 0.04, 0.4, z1 - 0.04, c));
+  g.add(box(x0, 0.4, z0, x1, 0.82, z0 + 0.12, c));
+  g.add(box(x0, 0.4, z0, x0 + 0.1, 0.65, z1, c), box(x1 - 0.1, 0.4, z0, x1, 0.65, z1, c));
+  g.add(box(x0 + 0.1, 0.4, z0 + 0.12, x1 - 0.1, 0.48, z1 - 0.02, cushion));
   return g;
 }
 
@@ -908,6 +926,267 @@ export function shrub(o = {}) {
   const g = new THREE.Group();
   for (let i = 0; i < 3; i++) {
     g.add(sphere((rand() - 0.5) * r, r * 0.7 + rand() * r * 0.3, (rand() - 0.5) * r, r * (0.6 + rand() * 0.4), leaves[i % leaves.length], 0));
+  }
+  return g;
+}
+
+// ---------------------------------------------------------------------------
+// Added for 22 Ellan Park
+// ---------------------------------------------------------------------------
+
+// White marble fire surround with a black insert and a marble hearth in front.
+export function fireSurround(w, d) {
+  const { g, x0, x1, z0 } = frame(w, d);
+  const back = z0, face = z0 + 0.12;
+  g.add(box(x0 - 0.05, 0, back, x1 + 0.05, 0.05, back + d, 'marble'));
+  g.add(box(x0, 0, back, x0 + 0.16, 1.08, face, 'white'), box(x1 - 0.16, 0, back, x1, 1.08, face, 'white'));
+  g.add(box(x0 - 0.04, 1.08, back, x1 + 0.04, 1.16, face + 0.04, 'white'));
+  g.add(box(x0 + 0.16, 0.88, back, x1 - 0.16, 1.08, face, 'white'));
+  g.add(box(x0 + 0.16, 0.05, back, x1 - 0.16, 0.88, back + 0.06, 'marble'));
+  g.add(box(x0 + 0.3, 0.05, back + 0.06, x1 - 0.3, 0.62, back + 0.08, '#1d1f22'));
+  return g;
+}
+
+// Built-in alcove unit: cupboard below, arched open niche with glass shelves above.
+export function alcoveUnit(w, d, o = {}) {
+  const { h = 2.15, cupboard = 0.86 } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, cupboard, z1, 'white'));
+  g.add(box(x0 + 0.05, 0.08, z1, x1 - 0.05, cupboard - 0.05, z1 + 0.01, '#f7f6f2'));
+  g.add(box(x0, cupboard, z0, x1, cupboard + 0.03, z1 + 0.02, 'white'));
+  g.add(box(x0, cupboard, z0, x1, h, z0 + 0.02, '#e9e3d8'));
+  for (const y of [cupboard + 0.38, cupboard + 0.72]) g.add(box(x0 + 0.03, y, z0 + 0.02, x1 - 0.03, y + 0.012, z1 - 0.04, 'glass'));
+  const r = w / 2 - 0.05;
+  const shape = new THREE.Shape([new THREE.Vector2(-w / 2, 0), new THREE.Vector2(w / 2, 0), new THREE.Vector2(w / 2, r + 0.12), new THREE.Vector2(-w / 2, r + 0.12)]);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, r, 0, Math.PI, false);
+  hole.lineTo(r, 0);
+  shape.holes.push(hole);
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: d - 0.02, bevelEnabled: false, curveSegments: 16 });
+  geo.translate(0, h - r - 0.12, z0 + 0.02);
+  g.add(mesh(geo, 'white'));
+  g.add(box(x0, cupboard, z0, x0 + 0.05, h - r, z1, 'white'), box(x1 - 0.05, cupboard, z0, x1, h - r, z1, 'white'));
+  g.add(cyl(-0.08, cupboard + 0.4, 0, 0.06, 0.12, '#2d2f33'), sphere(0.1, cupboard + 0.78, 0, 0.05, '#d9c9a5', 0));
+  return g;
+}
+
+export function wallClock(w) {
+  const g = new THREE.Group();
+  g.add(disc(0, 0, 0.02, w / 2, 0.04, 'black', 32));
+  g.add(disc(0, 0, 0.042, w / 2 - 0.03, 0.005, '#f7f6f2', 32));
+  g.add(box(-0.006, 0, 0.045, 0.006, w * 0.32, 0.05, 'black'));
+  g.add(box(0, -0.006, 0.045, w * 0.22, 0.006, 0.05, 'black'));
+  return g;
+}
+
+export function monitors(w, d) {
+  const g = new THREE.Group();
+  for (const x of [-0.3, 0.3]) {
+    g.add(box(x - 0.12, 0, -0.08, x + 0.12, 0.015, 0.06, 'black'));
+    g.add(box(x - 0.02, 0.015, -0.05, x + 0.02, 0.14, -0.02, 'black'));
+    g.add(box(x - 0.28, 0.12, -0.06, x + 0.28, 0.45, -0.03, 'black'));
+    g.add(box(x - 0.265, 0.135, -0.03, x + 0.265, 0.435, -0.027, 'blackGlass'));
+  }
+  return g;
+}
+
+export function ladderShelf(w, d, o = {}) {
+  const { h = 1.75 } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  for (const x of [x0 + 0.02, x1 - 0.02]) {
+    g.add(rod([x, 0, z1 - 0.03], [x, h, z0 + 0.05], 0.018, 'black'));
+    g.add(rod([x, 0, z0 + 0.02], [x, h, z0 + 0.03], 0.014, 'black'));
+  }
+  for (let i = 0; i < 4; i++) {
+    const t = i / 4;
+    const y = 0.15 + t * (h - 0.35);
+    const depth = (d - 0.05) * (1 - t * 0.85);
+    g.add(box(x0 + 0.03, y, z0 + 0.03, x1 - 0.03, y + 0.025, z0 + 0.03 + depth, '#8a6b4a'));
+    g.add(box(x0 + 0.1, y + 0.025, z0 + 0.05, x0 + 0.24, y + 0.16, z0 + 0.15, i % 2 ? '#d9c9a5' : '#2d2f33'));
+  }
+  return g;
+}
+
+export function roundMirror(w, o = {}) {
+  const { frameC = 'gold' } = o;
+  const g = new THREE.Group();
+  const t = new THREE.TorusGeometry(w / 2 - 0.015, 0.018, 8, 40);
+  t.translate(0, 0, 0.02);
+  g.add(mesh(t, frameC));
+  g.add(disc(0, 0, 0.012, w / 2 - 0.02, 0.01, 'mirror', 40));
+  return g;
+}
+
+// Tall ornate mirror leaning against the wall it is placed on.
+export function floorMirror(w, d, o = {}) {
+  const { h = 1.8 } = o;
+  const g = new THREE.Group();
+  const lean = new THREE.Group();
+  lean.add(box(-w / 2, 0, -0.03, w / 2, h, 0.03, '#c6c8cb'));
+  lean.add(box(-w / 2 + 0.1, 0.1, 0.03, w / 2 - 0.1, h - 0.1, 0.035, 'mirrorSoft'));
+  for (const [x, y] of [[-w / 2 + 0.05, h - 0.05], [w / 2 - 0.05, h - 0.05], [-w / 2 + 0.05, 0.05], [w / 2 - 0.05, 0.05], [0, h - 0.04]]) lean.add(sphere(x, y, 0.035, 0.06, 'silver', 0));
+  lean.position.z = -d / 2 + 0.3;
+  lean.rotation.x = -0.14;
+  g.add(lean);
+  return g;
+}
+
+// L-shaped sofa: long run with its back on -z, chaise along the +x end coming forward.
+export function cornerSofa(w, d, o = {}) {
+  const { body = 'velvetTaupe', leg = 0.95, pillows = [] } = o;
+  const g = new THREE.Group();
+  const longD = Math.min(0.95, d);
+  const long = sofa(w, longD, { body, seats: 3, pillows, legs: 'gold' });
+  long.position.z = -d / 2 + longD / 2;
+  g.add(long);
+  const x0 = w / 2 - leg, x1 = w / 2, za = -d / 2 + longD, zb = d / 2;
+  g.add(box(x0, 0.08, za - 0.05, x1, 0.3, zb, body));
+  g.add(box(x0 + 0.02, 0.3, za - 0.05, x1 - 0.2, 0.44, zb - 0.02, body));
+  g.add(box(x1 - 0.2, 0.3, za - 0.05, x1, 0.82, zb, body));
+  g.add(box(x0, 0.3, zb - 0.18, x1 - 0.2, 0.62, zb, body));
+  for (const [x, z] of [[x0 + 0.06, zb - 0.06], [x1 - 0.06, zb - 0.06]]) g.add(box(x - 0.025, 0, z - 0.025, x + 0.025, 0.08, z + 0.025, 'gold'));
+  return g;
+}
+
+export function ottoman(w, d, o = {}) {
+  const { c = 'mustard', legs = 'gold' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  for (const [x, z] of [[x0 + 0.06, z0 + 0.06], [x1 - 0.06, z0 + 0.06], [x0 + 0.06, z1 - 0.06], [x1 - 0.06, z1 - 0.06]]) g.add(rod([x, 0, z], [x * 0.96, 0.18, z * 0.96], 0.012, legs));
+  g.add(box(x0, 0.18, z0, x1, 0.42, z1, c));
+  return g;
+}
+
+export function pouffe(w, d, o = {}) {
+  const { c = 'mustard' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 0.38, z1, c));
+  return g;
+}
+
+export function sideTableRound(w) {
+  const g = new THREE.Group();
+  g.add(cyl(0, 0, 0, w / 2 - 0.04, 0.012, 'gold', 20));
+  g.add(cyl(0, 0, 0, 0.012, 0.6, 'gold', 8));
+  g.add(cyl(0, 0.6, 0, w / 2, 0.025, '#5d4433', 24));
+  return g;
+}
+
+export function tvPanel(w) {
+  const g = new THREE.Group();
+  g.add(box(-w / 2, 0, 0, w / 2, w * 0.57, 0.04, 'black'));
+  g.add(box(-w / 2 + 0.015, 0.015, 0.04, w / 2 - 0.015, w * 0.57 - 0.015, 0.044, 'blackGlass'));
+  return g;
+}
+
+// Picture-frame wall mouldings above a dado rail, as seen in the living room.
+export function wallPanels(w, d, o = {}) {
+  const { n = Math.max(1, Math.round(w / 1.1)), y0 = 1.05, y1 = 2.05, dado = 0.88, c = '#fbf9f4' } = o;
+  const g = new THREE.Group();
+  g.add(box(-w / 2, dado, 0, w / 2, dado + 0.05, 0.025, c));
+  const pw = w / n;
+  for (let i = 0; i < n; i++) {
+    const a = -w / 2 + i * pw + 0.18, b = a + pw - 0.36, t = 0.02;
+    g.add(box(a, y0, 0, b, y0 + t, 0.015, c), box(a, y1 - t, 0, b, y1, 0.015, c));
+    g.add(box(a, y0, 0, a + t, y1, 0.015, c), box(b - t, y0, 0, b, y1, 0.015, c));
+  }
+  return g;
+}
+
+// Tiled floating shelf with a vessel basin and wall-mounted tap.
+export function basinShelf(w, d) {
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0.68, z0, x1, 0.86, z1, 'metro'));
+  g.add(cyl(0, 0.86, 0.02, 0.19, 0.13, 'porcelain', 28, 0.21));
+  g.add(cyl(0, 0.96, 0.02, 0.16, 0.035, '#e3e8ea', 28));
+  g.add(rod([0, 1.12, z0], [0, 1.12, z0 + 0.15], 0.012, 'gold'));
+  g.add(cyl(x1 - 0.2, 0.86, z0 + 0.12, 0.05, 0.14, '#f2efe8'));
+  g.add(sphere(x1 - 0.2, 1.08, z0 + 0.12, 0.09, '#e58aa6', 0));
+  return g;
+}
+
+// Wall-hung WC with the cistern boxed in behind a tiled panel.
+export function toiletWall(w, d, o = {}) {
+  const { panel = 'beigeTile', plate = 'chrome' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 1.0, z0 + 0.18, panel));
+  g.add(box(-0.12, 0.78, z0 + 0.18, 0.12, 0.92, z0 + 0.19, plate));
+  const pan = new THREE.CylinderGeometry(0.18, 0.15, 0.3, 22);
+  pan.scale(1, 1, 1.4); pan.translate(0, 0.3, Math.min(z1 - 0.26, z0 + 0.46));
+  g.add(mesh(pan, 'porcelain'));
+  g.add(box(-0.17, 0.27, z0 + 0.18, 0.17, 0.45, z0 + 0.3, 'porcelain'));
+  const seat = new THREE.CylinderGeometry(0.185, 0.185, 0.035, 22);
+  seat.scale(1, 1, 1.4); seat.translate(0, 0.46, Math.min(z1 - 0.26, z0 + 0.46));
+  g.add(mesh(seat, '#f4f4f2'));
+  return g;
+}
+
+export function basinWall(w, d) {
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0.7, z0, x1, 0.86, z1, 'porcelain'));
+  g.add(box(x0 + 0.06, 0.8, z0 + 0.06, x1 - 0.06, 0.865, z1 - 0.05, '#e3e8ea'));
+  g.add(cyl(0, 0.45, z0 + 0.12, 0.022, 0.25, 'chrome'));
+  g.add(cyl(0, 0.86, z0 + 0.04, 0.016, 0.14, 'chrome'));
+  return g;
+}
+
+// Straight bath with a frosted screen and a riser rail at the +x end.
+export function bathStraight(w, d, o = {}) {
+  const { panel = 'porcelain' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 0.55, z1, panel));
+  g.add(box(x0 + 0.06, 0.5, z0 + 0.06, x1 - 0.06, 0.555, z1 - 0.06, '#e4ecef'));
+  g.add(box(x1 - 0.85, 0.55, z1 - 0.025, x1 - 0.02, 2.0, z1 - 0.015, 'obscure'));
+  g.add(rod([x1 - 0.85, 2.0, z1 - 0.02], [x1 - 0.02, 2.0, z1 - 0.02], 0.008, 'chrome'));
+  g.add(rod([x1 - 0.03, 0.95, z0 + 0.3], [x1 - 0.03, 1.9, z0 + 0.3], 0.012, 'chrome'));
+  g.add(cyl(x1 - 0.07, 1.65, z0 + 0.3, 0.035, 0.12, 'chrome'));
+  g.add(box(x1 - 0.06, 0.9, z0 + 0.22, x1, 0.98, z0 + 0.38, 'chrome'));
+  return g;
+}
+
+export function evCharger() {
+  const g = new THREE.Group();
+  g.add(box(-0.12, -0.18, 0, 0.12, 0.18, 0.12, '#f2f2ef'));
+  g.add(box(-0.08, -0.06, 0.12, 0.08, 0.12, 0.125, '#2b2e31'));
+  g.add(rod([0.05, -0.18, 0.08], [0.15, -0.6, 0.15], 0.015, 'black'));
+  return g;
+}
+
+export function meterBox() {
+  const g = new THREE.Group();
+  g.add(box(-0.22, 0, 0, 0.22, 0.55, 0.2, '#f2f2ef'));
+  g.add(box(-0.2, 0.02, 0.2, 0.2, 0.53, 0.205, '#e3e3df'));
+  return g;
+}
+
+export function gardenSwing(w, d) {
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  const top = 1.95, c = '#c9cdd1';
+  for (const x of [x0 + 0.05, x1 - 0.05]) {
+    g.add(rod([x, 0, z0], [x, top, 0], 0.025, c), rod([x, 0, z1], [x, top, 0], 0.025, c));
+  }
+  g.add(rod([x0 + 0.05, top, 0], [x1 - 0.05, top, 0], 0.03, c));
+  for (const x of [x0 + 0.35, x1 - 0.35]) g.add(rod([x, top, 0], [x, 0.55, 0], 0.01, c));
+  g.add(box(x0 + 0.3, 0.45, -0.25, x1 - 0.3, 0.52, 0.25, '#2d3035'));
+  g.add(box(x0 + 0.3, 0.52, -0.27, x1 - 0.3, 1.05, -0.22, '#2d3035'));
+  return g;
+}
+
+export function storeBox(w, d, o = {}) {
+  const { c = '#3a3d41' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 0.75, z1, c));
+  g.add(box(x0 - 0.02, 0.75, z0 - 0.02, x1 + 0.02, 0.8, z1 + 0.02, '#2c2f33'));
+  return g;
+}
+
+// Vertical slatted screen beside a stair, from the pitch line up to the ceiling.
+export function slatScreen(len, o = {}) {
+  const { rise = 0.927, top = 2.4, start = 0.9, gap = 0.11 } = o;
+  const g = new THREE.Group();
+  for (let x = 0.05; x < len; x += gap) {
+    const y0 = start + x * rise;
+    if (y0 >= top - 0.1) break;
+    g.add(box(x - 0.02, y0, -0.02, x + 0.02, top, 0.02, 'white'));
   }
   return g;
 }

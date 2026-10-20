@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
-  <link rel="stylesheet" href="css/tour.css" />
+  <link rel="stylesheet" href="../tour-kit/tour.css" />
   <script type="importmap">
     {
       "imports": {
@@ -29,7 +29,8 @@
       <ul class="masthead-facts" id="prop-facts" aria-label="Key facts"></ul>
       <div class="masthead-source">
         <span class="price" id="prop-price">£339,950</span>
-        <a href="https://koopsandco.com/property/ellan-park-ramsey-im8/" target="_blank" rel="noopener">Source listing ↗</a>
+        <a id="prop-source" href="https://koopsandco.com/property/ellan-park-ramsey-im8/" target="_blank" rel="noopener">Source listing ↗</a>
+        <span class="masthead-related" id="prop-related" hidden></span>
       </div>
     </header>
 
@@ -94,6 +95,6 @@
 
     <aside class="details" id="details" aria-live="polite"></aside>
   </div>
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

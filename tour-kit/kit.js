@@ -165,7 +165,7 @@ const TEX = {
   }),
 
   // Roof courses run along v (the ridge direction); u climbs the slope.
-  roof: ({ base, size = 1 }) => canvasTex(size, (g, px) => {
+  roof: ({ base, size = 1, moss = 0 }) => canvasTex(size, (g, px) => {
     const rand = rng(9);
     const courses = 4, tiles = 3;
     const cw = px / courses, th = px / tiles;
@@ -185,7 +185,35 @@ const TEX = {
       g.fillStyle = 'rgba(0,0,0,0.35)';
       g.fillRect(c * cw, 0, 3, px);
     }
+    if (moss) speckle(g, px, moss, ['rgba(110,128,60,0.55)', 'rgba(140,150,80,0.45)', 'rgba(90,105,50,0.5)'], 2, 6, rand);
   }),
+
+  // Horizontal bands up a wall (paint, tiles, a rail line). u spans `width` metres, v spans `height`.
+  band: ({ height = 2.65, width = 0.6, bands }) => {
+    const t = canvasTex(1, (g, px) => {
+      const yOf = (m) => px * (1 - m / height);
+      for (const b of bands) {
+        const top = yOf(b.to), bottom = yOf(b.from);
+        if (b.color) { g.fillStyle = b.color; g.fillRect(0, top, px, bottom - top); }
+        if (b.tiles) {
+          const { tw, th, base, grout } = b.tiles;
+          const cols = Math.round(width / tw), rows = Math.max(1, Math.round((b.to - b.from) / th));
+          const cw = px / cols, rh = (bottom - top) / rows;
+          g.fillStyle = grout; g.fillRect(0, top, px, bottom - top);
+          for (let r = 0; r < rows; r++) {
+            const off = r % 2 ? cw / 2 : 0;
+            for (let c = -1; c <= cols; c++) {
+              g.fillStyle = base;
+              g.fillRect(c * cw + off + 1.2, bottom - (r + 1) * rh + 1.2, cw - 2.4, rh - 2.4);
+            }
+          }
+        }
+        if (b.line) { g.fillStyle = b.line; g.fillRect(0, top - 3, px, 6); }
+      }
+    });
+    t.repeat.set(1 / width, 1 / height);
+    return t;
+  },
 
   lawn: ({ size = 3 }) => canvasTex(size, (g, px) => {
     const rand = rng(5);
@@ -282,6 +310,7 @@ const DEF = {
   glass: { color: '#a9cad8', rough: 0.05, metal: 0.1, opacity: 0.34, env: true },
   obscure: { color: '#e4ecef', rough: 0.3, opacity: 0.78, env: true },
   mirror: { color: '#cfdde3', rough: 0.02, metal: 0.9, env: true },
+  mirrorSoft: { color: '#d3dfe4', rough: 0.15, metal: 0.3, env: true },
   chrome: { color: '#d6d9dc', rough: 0.2, metal: 0.9, env: true },
   steel: { color: '#bfc3c6', rough: 0.35, metal: 0.75, env: true },
   black: { color: '#1f2225', rough: 0.5 },
@@ -342,6 +371,46 @@ const DEF = {
   shedDark: { color: '#6e7276', rough: 0.7 },
   rattan: { tex: () => TEX.weave({ base: '#5b4434' }) },
   sky: { color: '#ffffff' },
+
+  // 22 Ellan Park: painted render, anthracite joinery, terrace neighbours
+  render22: { tex: () => TEX.speck({ base: '#cdd2d3', colors: ['#c3c8c9', '#d6dadb', '#c8cdce'], size: 0.8, n: 6000, seed: 51 }) },
+  renderBeige: { tex: () => TEX.speck({ base: '#d6cab4', colors: ['#bfb39c', '#e2d8c4', '#c9bda6', '#ab9f89'], size: 0.8, n: 15000, seed: 52 }) },
+  renderCream: { tex: () => TEX.speck({ base: '#e4d9c0', colors: ['#d8ccb2', '#ece3cd'], size: 0.8, n: 6000, seed: 53 }) },
+  roofMoss: { tex: () => TEX.roof({ base: '#6c645b', moss: 2600 }), rough: 0.9 },
+  roofMossZ: { tex: () => { const t = TEX.roof({ base: '#6c645b', moss: 2600 }); t.rotation = Math.PI / 2; return t; }, rough: 0.9 },
+  roofBrownZ: { tex: () => { const t = TEX.roof({ base: '#6b5145' }); t.rotation = Math.PI / 2; return t; }, rough: 0.8 },
+  roofBrown: { tex: () => TEX.roof({ base: '#6b5145' }), rough: 0.8 },
+  anthracite: { color: '#3b4046', rough: 0.45 },
+  navyDoor: { color: '#2b3b57', rough: 0.45 },
+  fascia: { color: '#f2f2ef', rough: 0.5 },
+  duckEgg: { color: '#a6c0c7' },
+  duckEggPanel: { color: '#98b4bc' },
+  oakTop: { tex: () => TEX.planks({ base: '#d8bf98', size: 1.2, w: 0.6, vary: 0.04, seed: 54 }), rough: 0.6 },
+  metro: { tex: () => TEX.tiles({ base: '#f5f5f2', grout: '#d3d3cf', tw: 0.2, th: 0.1, size: 0.6, vary: 0.02, stagger: true }), rough: 0.3 },
+  wall22: { color: '#f1eee8' },
+  dining22: { color: '#efe9df' },
+  living22: { color: '#efe5d4' },
+  wc22: { tex: () => TEX.band({ width: 0.6, bands: [{ from: 1.25, to: 2.65, color: '#1f4744' }, { from: 0, to: 1.25, tiles: { tw: 0.2, th: 0.1, base: '#f6f6f3', grout: '#3d4248' } }] }), rough: 0.4 },
+  bed3pink: { tex: () => TEX.band({ bands: [{ from: 0, to: 2.65, color: '#f2eee9' }, { from: 0, to: 1.9, color: '#e6c0bf' }] }) },
+  landing22: { color: '#efe7d7' },
+  bedWhite: { color: '#eeebe5' },
+  bed1w22: { color: '#e7e4de' },
+  beigeTile: { tex: () => TEX.tiles({ base: '#cdb694', grout: '#bca582', tw: 0.6, th: 0.3, size: 1.2, vary: 0.04, stagger: false, seed: 55 }), rough: 0.35 },
+  beigeFloor: { tex: () => TEX.tiles({ base: '#ddcfb5', grout: '#c8b99d', tw: 0.6, th: 0.6, size: 1.2, vary: 0.03, seed: 56 }), rough: 0.4 },
+  carpetBeige: { tex: () => TEX.speck({ base: '#c4b7a2', colors: ['#b7a994', '#d0c4b0', '#ada08b'], size: 0.5, n: 14000, seed: 57 }), rough: 1 },
+  carpetGrey: { tex: () => TEX.speck({ base: '#a9abad', colors: ['#9b9da0', '#b6b8ba'], size: 0.5, n: 12000, seed: 58 }), rough: 1 },
+  velvetTaupe: { color: '#9a846d', rough: 0.95 },
+  mustard: { color: '#d2a11f', rough: 0.9 },
+  tanLeather: { color: '#a6704b', rough: 0.6 },
+  herringbone: { tex: () => TEX.planks({ base: '#c4955b', size: 0.6, w: 0.1, vary: 0.12, seed: 59 }), rough: 0.6 },
+  marble: { tex: () => TEX.speck({ base: '#f1f0ec', colors: ['#d9d8d3', '#c9c8c3', '#e5e4df'], size: 0.4, n: 1600, rMin: 1, rMax: 7, seed: 60 }), rough: 0.25 },
+  gold: { color: '#c9a45c', rough: 0.3, metal: 0.8, env: true },
+  silver: { color: '#c7c9cc', rough: 0.3, metal: 0.8, env: true },
+  blockPaving: { tex: () => TEX.tiles({ base: '#8e8478', grout: '#6e665c', tw: 0.2, th: 0.1, size: 0.8, vary: 0.16, stagger: true, seed: 61 }), rough: 1 },
+  redPath: { tex: () => TEX.speck({ base: '#8a5c50', colors: ['#7a4f44', '#9a6a5d', '#6f463c'], size: 1, n: 14000, seed: 62 }), rough: 1 },
+  astro: { tex: () => TEX.speck({ base: '#7fbe48', colors: ['#6fae3c', '#8fcb58', '#76b443'], size: 1, n: 16000, seed: 63 }), rough: 1 },
+  fenceWeathered: { tex: () => TEX.boards({ base: '#a0968a', n: 7, seed: 64 }) },
+  pinkVelvet: { color: '#d9a7a6', rough: 0.95 },
 
   // furnishings
   white: { color: '#f3f2ee' },
