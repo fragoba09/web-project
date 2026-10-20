@@ -364,6 +364,8 @@ const DEF = {
   bark: { color: '#6b5240', rough: 1 },
   fenceTimber: { tex: () => TEX.boards({ base: '#b99566' }) },
   fenceGreen: { tex: () => TEX.laps({ base: '#4d6a49' }) },
+  superlap: { tex: () => TEX.laps({ base: '#c8863a', size: 1.32, n: 12 }) },
+  felt: { tex: () => TEX.speck({ base: '#3a3d41', colors: ['#2f3236', '#45484c'], size: 0.6, n: 5000, seed: 65 }), rough: 0.95 },
   post: { color: '#a8a49b' },
   road: { tex: () => TEX.speck({ base: '#4a4d50', colors: ['#3d4043', '#57595c', '#606366'], size: 1, n: 16000, seed: 34 }), rough: 1 },
   board: { color: '#59636e', rough: 1 },

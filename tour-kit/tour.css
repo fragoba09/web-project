@@ -22,6 +22,7 @@
   --src-listing: #217459;
   --src-photo: #a65f17;
   --src-inferred: #7d50a0;
+  --src-proposed: #b0376c;
   --focus: #f0a020;
 
   --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
@@ -53,6 +54,7 @@
     --src-listing: #5ac39d;
     --src-photo: #e3a058;
     --src-inferred: #c39ae6;
+    --src-proposed: #f08ab8;
     color-scheme: dark;
   }
 }
@@ -77,6 +79,7 @@
   --src-listing: #5ac39d;
   --src-photo: #e3a058;
   --src-inferred: #c39ae6;
+  --src-proposed: #f08ab8;
   color-scheme: dark;
 }
 
@@ -238,6 +241,7 @@ a { color: var(--accent); }
 .chip-listing { --chip: var(--src-listing); }
 .chip-photo { --chip: var(--src-photo); }
 .chip-inferred { --chip: var(--src-inferred); border-style: dashed; }
+.chip-proposed { --chip: var(--src-proposed); }
 
 /* ---------------------------------------------------------------- stage */
 
@@ -371,11 +375,11 @@ a { color: var(--accent); }
 .tip-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .tip-meta { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.8; margin-top: 2px; }
 .tip p { margin-top: 5px; opacity: 0.85; }
-.tip .chip { --src-plan: #9db8ea; --src-listing: #66cba6; --src-photo: #eaa864; --src-inferred: #c9a3ea; }
+.tip .chip { --src-plan: #9db8ea; --src-listing: #66cba6; --src-photo: #eaa864; --src-inferred: #c9a3ea; --src-proposed: #f29cc2; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .tip .chip { --src-plan: #3b5a8c; --src-listing: #217459; --src-photo: #a65f17; --src-inferred: #7d50a0; }
+  :root:not([data-theme="light"]) .tip .chip { --src-plan: #3b5a8c; --src-listing: #217459; --src-photo: #a65f17; --src-inferred: #7d50a0; --src-proposed: #b0376c; }
 }
-:root[data-theme="dark"] .tip .chip { --src-plan: #3b5a8c; --src-listing: #217459; --src-photo: #a65f17; --src-inferred: #7d50a0; }
+:root[data-theme="dark"] .tip .chip { --src-plan: #3b5a8c; --src-listing: #217459; --src-photo: #a65f17; --src-inferred: #7d50a0; --src-proposed: #b0376c; }
 
 .loading {
   position: absolute;
@@ -450,6 +454,7 @@ a { color: var(--accent); }
 .facts-listing { --chip: var(--src-listing); }
 .facts-photo { --chip: var(--src-photo); }
 .facts-inferred { --chip: var(--src-inferred); }
+.facts-proposed { --chip: var(--src-proposed); }
 
 .inventory { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
 .inventory .count { font-family: var(--font-mono); font-weight: 400; color: var(--muted); }

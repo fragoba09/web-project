@@ -42,7 +42,8 @@ export const VIEWS = [
       { text: 'Bedroom 3', pos: [7.35, 4.95, 5.05], go: 'bedroom-3' },
       { text: 'Patio', pos: [11.9, -0.2, 4.4] },
       { text: 'Lawn', pos: [16.5, -0.2, 2.6] },
-      { text: 'Swing', pos: [19.0, 2.15, 2.9] },
+      { text: 'Swing', pos: [14.2, 2.15, 1.9] },
+      { text: 'Garden studio', pos: [21.0, 2.95, 1.81], go: 'garden-studio' },
     ],
     info: {
       eyebrow: 'Outside · rear',
@@ -50,6 +51,27 @@ export const VIEWS = [
       listing: ['Good-sized south-facing rear garden', 'Ideal for outdoor dining, entertaining and summer barbecues'],
       photos: ['Single-storey extension with French doors', 'Navy cottage-style back door under a small gable', 'Artificial lawn, concrete side path and timber fencing', 'Garden swing and a storage box'],
       inferred: ['Garden length of about 11 m', 'Extension roof pitch and eaves height'],
+      proposed: ['A garden studio in the far corner, across the lawn from the side path'],
+    },
+  },
+  {
+    id: 'garden-studio', kind: 'exterior', group: 'Outside', title: 'Garden studio', az: -62, el: 30,
+    box: [[17.4, -0.4, -0.2], [22.6, 3.0, 4.6]],
+    labels: [
+      { text: 'Garden studio', pos: [21.0, 2.95, 1.81] },
+      { text: 'Side path', pos: [18.6, -0.2, 5.7] },
+    ],
+    info: {
+      eyebrow: 'Outside · proposed addition',
+      dims: { imp: '9\'10" × 7\'4"', met: '3.02 × 2.23 m', note: 'external footprint' },
+      summary: 'A Shire Superlap garden studio at the far end of the garden, across the lawn from the side path, with its doors facing the house. It is not part of the property.',
+      proposed: [
+        'Shire 10 × 7 ft Superlap garden studio, £2,989 on B&Q\'s website (diy.com)',
+        'Apex roof: 2.13 m to the eaves, 2.55 m to the ridge',
+        'Glazed double doors (1.42 × 1.81 m) and two opening windows on the long side',
+        'Inside: 2.88 × 2.09 m, about 6 m² of floor',
+      ],
+      inferred: ['Honey-stained cladding, anthracite trim and a felt roof, as in the product photos', 'Set about 0.35 m in from the back and side fences, on a slab base', 'The swing has moved nearer the house so the studio doors can open'],
     },
   },
   {

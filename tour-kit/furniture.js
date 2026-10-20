@@ -2,7 +2,7 @@
 // Every builder works in a local frame: footprint w (along x) by d (along z),
 // centred on the origin, standing on y = 0, with its front facing +z.
 import * as THREE from 'three';
-import { box, cyl, rod, sphere, mesh, M, rng } from './kit.js';
+import { box, cyl, rod, sphere, mesh, prismX, worldUV, M, rng } from './kit.js';
 
 function frame(w, d) {
   return { g: new THREE.Group(), x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2 };
@@ -1187,6 +1187,54 @@ export function slatScreen(len, o = {}) {
     const y0 = start + x * rise;
     if (y0 >= top - 0.1) break;
     g.add(box(x - 0.02, y0, -0.02, x + 0.02, top, 0.02, 'white'));
+  }
+  return g;
+}
+
+// Apex garden studio (Shire 10 x 7 ft Superlap): glazed double doors and two windows
+// on the long front (+z), gables at the short ends. Sizes follow the maker's drawing.
+export function gardenStudio(w, d, o = {}) {
+  const { eaves = 2.125, ridge = 2.553, overhang = [0.067, 0.119] } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  const trim = 'anthracite', base = 0.09;
+  g.add(box(x0 - 0.12, 0, z0 - 0.12, x1 + 0.12, 0.05, z1 + 0.12, 'concrete'));
+  g.add(box(x0, 0.05, z0, x1, base, z1, '#7a5a35'));
+  g.add(box(x0, base, z0, x1, eaves, z1, 'superlap'));
+  for (const [xa, xb] of [[x0, x0 + 0.02], [x1 - 0.02, x1]]) g.add(prismX([[z0, eaves], [z1, eaves], [0, ridge]], xa, xb, 'superlap'));
+
+  // Felt roof: two slabs falling from the ridge, with barge boards on the gables.
+  const [ox, oz] = overhang;
+  const pitch = (ridge - eaves) / (d / 2), run = d / 2 + oz, L = Math.hypot(run, run * pitch), ang = Math.atan(pitch);
+  for (const s of [-1, 1]) {
+    const slab = mesh(worldUV(new THREE.BoxGeometry(w + 2 * ox, 0.04, L).translate(0, 0.02, (s * L) / 2)), 'felt');
+    slab.position.set(0, ridge, 0);
+    slab.rotation.x = s * ang;
+    g.add(slab);
+    for (const xe of [x0 - ox, x1 + ox]) {
+      const barge = mesh(new THREE.BoxGeometry(0.03, 0.12, L).translate(xe, -0.04, (s * L) / 2), trim);
+      barge.position.set(0, ridge, 0);
+      barge.rotation.x = s * ang;
+      g.add(barge);
+    }
+  }
+  g.add(box(x0 - ox, ridge, -0.05, x1 + ox, ridge + 0.05, 0.05, 'felt'));
+
+  for (const x of [x0, x1]) for (const z of [z0, z1]) g.add(box(x - 0.035, base, z - 0.035, x + 0.035, eaves, z + 0.035, trim));
+
+  // Double doors to the left of the front, then a trim post and two windows.
+  const dA = x0 + 0.12, dB = dA + 1.424, dY0 = base + 0.02, dY1 = dY0 + 1.805, mid = (dA + dB) / 2;
+  g.add(box(dA - 0.05, dY0, z1, dB + 0.05, dY1 + 0.05, z1 + 0.02, trim));
+  for (const [a, b] of [[dA, mid - 0.005], [mid + 0.005, dB]]) {
+    g.add(box(a, dY0, z1 + 0.02, b, dY1, z1 + 0.04, trim));
+    g.add(box(a + 0.08, dY0 + 0.25, z1 + 0.04, b - 0.08, dY1 - 0.08, z1 + 0.045, 'blackGlass'));
+  }
+  g.add(box(mid + 0.02, dY0 + 0.95, z1 + 0.045, mid + 0.05, dY0 + 1.05, z1 + 0.07, 'chrome'));
+  const post = dB + 0.12;
+  g.add(box(post - 0.035, base, z1, post + 0.035, eaves, z1 + 0.015, trim));
+  const ww = (x1 - post - 0.2) / 2;
+  for (const a of [post + 0.08, post + 0.12 + ww]) {
+    g.add(box(a, 1.12, z1, a + ww, 1.94, z1 + 0.03, trim));
+    g.add(box(a + 0.05, 1.17, z1 + 0.03, a + ww - 0.05, 1.89, z1 + 0.035, 'blackGlass'));
   }
   return g;
 }

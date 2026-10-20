@@ -21,8 +21,10 @@ export const PROVENANCE = {
   inferred: { label: 'Inferred', hint: 'Not shown in the listing; filled in by reasoning' },
 };
 
-// config: { buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey }
-export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey = 'tour-prefs' }) {
+// config: { buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey, provenance }
+// provenance adds extra source tags for one tour, for example planned additions.
+export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey = 'tour-prefs', provenance = {} }) {
+  const PROV = { ...PROVENANCE, ...provenance };
   const VIEW_BY_ID = Object.fromEntries(VIEWS.map((v) => [v.id, v]));
   const roomY = (r) => r.y ?? FLOOR_Y[r.floor];
 
@@ -381,7 +383,7 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
   }
 
   function chip(src) {
-    const p = PROVENANCE[src];
+    const p = PROV[src];
     return p ? `<span class="chip chip-${src}" title="${esc(p.hint)}">${esc(p.label)}</span>` : '';
   }
 
@@ -517,7 +519,8 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
     } else if (view.kind === 'exterior') {
       for (const n of model.nodes) if (['site', 'roof', 'neighbour'].includes(n.userData.layer)) add(n);
     }
-    return [...counts.values()];
+    // Planned additions first, so a scene built around one leads with it.
+    return [...counts.values()].sort((a, b) => (b.src === 'proposed') - (a.src === 'proposed'));
   }
 
   let inventoryEntries = [];
@@ -551,6 +554,7 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
       ${info.summary ? `<p class="summary">${esc(info.summary)}</p>` : ''}
       ${list('From the listing', 'listing', info.listing)}
       ${list('Seen in the photos', 'photo', info.photos)}
+      ${list('Proposed additions', 'proposed', info.proposed)}
       ${list('Filled in by reasoning', 'inferred', info.inferred)}
       ${extra}`;
     els.details.scrollTop = 0;
@@ -661,7 +665,7 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
     related.innerHTML = PROPERTY.related.map((r) => `<a href="${esc(r.href)}">${esc(r.label)} →</a>`).join('');
     related.hidden = false;
   }
-  $('#legend').innerHTML = Object.keys(PROVENANCE).map((k) => `<li>${chip(k)}<span>${esc(PROVENANCE[k].hint)}</span></li>`).join('');
+  $('#legend').innerHTML = Object.keys(PROV).map((k) => `<li>${chip(k)}<span>${esc(PROV[k].hint)}</span></li>`).join('');
 
   // ---------------------------------------------------------------------------
   // Loop

@@ -308,9 +308,14 @@ function buildSite(reg, put) {
   put(null, 'Car, shown for scale on the driveway', 'inferred', [-5.9, 0.6, -1.3, 2.4], '+z', (w, d) => F.car(w, d, { c: '#4d5560' }), { ...site, tall: true, note: 'The listing says the driveway gives ample off-road parking for multiple vehicles.' });
   put(null, 'Electric vehicle charging point', 'listing', [0, 3.62, 0, 3.86], '-x', () => F.evCharger(), { ...site, y: 1.25, attach: 'gf-front-kitchen' });
   put(null, 'Meter box', 'photo', [0, 3.15, 0, 3.6], '-x', () => F.meterBox(), { ...site, y: 0.2, attach: 'gf-front-kitchen' });
-  put(null, 'Garden swing', 'photo', [18.4, 2.0, 19.6, 3.8], '-x', (w, d) => F.gardenSwing(w, d), { ...back, tall: true });
+  put(null, 'Garden swing', 'photo', [13.6, 1.0, 14.8, 2.8], '-x', (w, d) => F.gardenSwing(w, d), { ...back, tall: true, note: 'Moved nearer the house to leave room for the proposed garden studio.' });
+  // Proposed addition, not part of the sale: a Shire 10 x 7 ft Superlap garden studio
+  // (3.02 x 2.23 m) in the far corner, across the lawn from the side path, doors facing the house.
+  put(null, 'Shire Superlap garden studio, 10 × 7 ft', 'proposed', [19.92, 0.3, 22.15, 3.32], '-x', (w, d) => F.gardenStudio(w, d), {
+    ...back, tall: true, note: '3.02 × 2.23 m, 2.55 m to the ridge. Shown on a slab base with its doors facing the house.',
+  });
   put(null, 'Garden storage box', 'photo', [11.5, 0.35, 12.1, 1.3], '-x', (w, d) => F.storeBox(w, d), back);
-  const shrubs = [[21.9, 0.5], [21.9, 4.7], [14.5, 0.4], [17.2, 0.4]];
+  const shrubs = [[21.9, 4.7], [14.5, 0.4], [17.2, 0.4]];
   shrubs.forEach(([x, z], i) => put(null, 'Border planting', 'photo', [x - 0.3, z - 0.3, x + 0.3, z + 0.3], '+z', () => F.shrub({ r: 0.28, seed: i + 7 }), back));
 }
 
