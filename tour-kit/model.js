@@ -356,3 +356,46 @@ export function fenceRun(g, a, b, axis, at, h, m, postM, postEvery = 1.83, y0 = 
     else g.add(box(at - 0.05, y0, p - 0.05, at + 0.05, h + 0.08, p + 0.05, postM));
   }
 }
+
+// Hipped roof over a rectangle (the eave outline, overhang included), all four
+// slopes at the same pitch, ridge along the longer side. Faces carry slope/eave
+// UVs in metres so roof-tile textures run with the eaves.
+export function hipRoof(x0, x1, z0, z1, eave, pitchDeg, m) {
+  const t = Math.tan((pitchDeg * Math.PI) / 180);
+  const alongZ = z1 - z0 >= x1 - x0;
+  const half = (alongZ ? x1 - x0 : z1 - z0) / 2;
+  const top = eave + half * t;
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  let faces;
+  if (alongZ) {
+    const xm = (x0 + x1) / 2, ra = V(xm, top, z0 + half), rb = V(xm, top, z1 - half);
+    faces = [[V(x0, eave, z0), V(x0, eave, z1), rb, ra], [V(x1, eave, z1), V(x1, eave, z0), ra, rb], [V(x1, eave, z0), V(x0, eave, z0), ra], [V(x0, eave, z1), V(x1, eave, z1), rb]];
+  } else {
+    const zm = (z0 + z1) / 2, ra = V(x0 + half, top, zm), rb = V(x1 - half, top, zm);
+    faces = [[V(x1, eave, z0), V(x0, eave, z0), ra, rb], [V(x0, eave, z1), V(x1, eave, z1), rb, ra], [V(x0, eave, z0), V(x0, eave, z1), ra], [V(x1, eave, z1), V(x1, eave, z0), rb]];
+  }
+  const pos = [], nor = [], uv = [];
+  for (const f of faces) {
+    const tris = f.length === 4 ? [[f[0], f[1], f[2]], [f[0], f[2], f[3]]] : [f];
+    const e = f[1].clone().sub(f[0]).normalize();
+    let n = f[1].clone().sub(f[0]).cross(f[2].clone().sub(f[0])).normalize();
+    const flip = n.y < 0;
+    if (flip) n = n.negate();
+    const s = n.clone().cross(e).normalize();
+    if (s.y < 0) s.negate();
+    for (let tri of tris) {
+      if (flip) tri = [tri[0], tri[2], tri[1]];
+      for (const p of tri) {
+        const d = p.clone().sub(f[0]);
+        pos.push(p.x, p.y, p.z); nor.push(n.x, n.y, n.z); uv.push(d.dot(s), d.dot(e));
+      }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  const g = new THREE.Group();
+  g.add(mesh(geo, m));
+  return { g, top, ridge: alongZ ? [[(x0 + x1) / 2, z0 + half], [(x0 + x1) / 2, z1 - half]] : [[x0 + half, (z0 + z1) / 2], [x1 - half, (z0 + z1) / 2]] };
+}

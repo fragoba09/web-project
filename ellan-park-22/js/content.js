@@ -8,7 +8,10 @@ export const PROPERTY = {
   facts: ['Terraced', '3 bedrooms', 'Bathroom + WC', '1,096 ft² · 101.9 m²'],
   source: 'https://deanwood.im/property/22-ellan-park-ramsey-isle-of-man/',
   agent: 'DeanWood',
-  related: [{ label: 'Also on Ellan Park: No. 16', href: '../ellan-park-16/' }],
+  related: [
+    { label: 'Also on Ellan Park: No. 16', href: '../ellan-park-16/' },
+    { label: '19 Laurys Avenue', href: '../laurys-avenue-19/' },
+  ],
 };
 
 const room = (id, room, title, az, extra) => ({ id, kind: 'room', room, title, az, el: 36, ...extra });

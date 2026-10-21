@@ -21,9 +21,10 @@ export const PROVENANCE = {
   inferred: { label: 'Inferred', hint: 'Not shown in the listing; filled in by reasoning' },
 };
 
-// config: { buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey, provenance }
-// provenance adds extra source tags for one tour, for example planned additions.
-export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey = 'tour-prefs', provenance = {} }) {
+// config: { buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey, provenance, sources }
+// provenance adds extra source tags for one tour, for example planned additions;
+// sources limits the legend to the tags a tour actually uses.
+export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPERTY, storageKey = 'tour-prefs', provenance = {}, sources = null }) {
   const PROV = { ...PROVENANCE, ...provenance };
   const VIEW_BY_ID = Object.fromEntries(VIEWS.map((v) => [v.id, v]));
   const roomY = (r) => r.y ?? FLOOR_Y[r.floor];
@@ -242,12 +243,32 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
     if (prefs.walls === 'low') return false;
     let n = def.out ? OUT[def.out] : null;
     if (!n && view.kind === 'room') {
-      const r = ROOMS[view.room].rect;
       const mid = (def.at[0] + def.at[1]) / 2;
-      n = def.dir === 'z' ? [Math.sign(mid - (r[0] + r[2]) / 2), 0] : [0, Math.sign(mid - (r[1] + r[3]) / 2)];
+      const side = Math.sign(mid - roomCentreAcross(ROOMS[view.room], def));
+      n = def.dir === 'z' ? [side, 0] : [0, side];
     }
     if (!n) return false;
     return n[0] * dir.x + n[1] * dir.z < 0.2;
+  }
+
+  // Centre of the room across a wall. When the middle of the room's bounding rect is
+  // not on its own floor (an L-shaped hall), measure on the floor piece that runs
+  // along the wall instead, so the walls nearest the camera still come down.
+  function roomCentreAcross(r, def) {
+    const z = def.dir === 'z';
+    const cx = (r.rect[0] + r.rect[2]) / 2, cz = (r.rect[1] + r.rect[3]) / 2;
+    if (r.floors.some((f) => cx >= f[0] && cx <= f[2] && cz >= f[1] && cz <= f[3])) return z ? cx : cz;
+    const mid = (def.at[0] + def.at[1]) / 2;
+    let best = null, bestGap = Infinity;
+    for (const f of r.floors) {
+      const [a0, a1] = z ? [f[1], f[3]] : [f[0], f[2]];
+      const [c0, c1] = z ? [f[0], f[2]] : [f[1], f[3]];
+      if (Math.min(def.span[1], a1) - Math.max(def.span[0], a0) <= 0.1) continue;
+      const gap = Math.max(c0 - mid, mid - c1, 0);
+      if (gap < bestGap) { best = (c0 + c1) / 2; bestGap = gap; }
+    }
+    if (best !== null && bestGap < 0.5) return best;
+    return z ? cx : cz;
   }
 
   function updateCutaway() {
@@ -665,7 +686,7 @@ export function startTour({ buildModel, ROOMS, FLOOR_Y, ROOM_VIEW, VIEWS, PROPER
     related.innerHTML = PROPERTY.related.map((r) => `<a href="${esc(r.href)}">${esc(r.label)} →</a>`).join('');
     related.hidden = false;
   }
-  $('#legend').innerHTML = Object.keys(PROV).map((k) => `<li>${chip(k)}<span>${esc(PROV[k].hint)}</span></li>`).join('');
+  $('#legend').innerHTML = (sources ?? Object.keys(PROV)).map((k) => `<li>${chip(k)}<span>${esc(PROV[k].hint)}</span></li>`).join('');
 
   // ---------------------------------------------------------------------------
   // Loop

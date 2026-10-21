@@ -851,16 +851,17 @@ export function gardenBench(w, d) {
   return g;
 }
 
-export function shed(w, d) {
+export function shed(w, d, o = {}) {
+  const { body = 'shed', trim = 'shedDark' } = o;
   const { g, x0, x1, z0, z1 } = frame(w, d);
-  g.add(box(x0, 0, z0, x1, 1.85, z1, 'shed'));
+  g.add(box(x0, 0, z0, x1, 1.85, z1, body));
   const roofPts = [[x0 - 0.06, 1.85], [x1 + 0.06, 1.85], [0, 2.3]];
   const shape = new THREE.Shape(roofPts.map(([a, b]) => new THREE.Vector2(a, b)));
   const geo = new THREE.ExtrudeGeometry(shape, { depth: d + 0.12, bevelEnabled: false });
   geo.translate(0, 0, z0 - 0.06);
-  g.add(mesh(geo, 'shedDark'));
-  g.add(box(-0.5, 0.05, z1, -0.01, 1.75, z1 + 0.02, 'shedDark'), box(0.01, 0.05, z1, 0.5, 1.75, z1 + 0.02, 'shedDark'));
-  for (const x of [-0.42, -0.25, 0.09, 0.26]) g.add(box(x, 0.12, z1 + 0.02, x + 0.12, 1.68, z1 + 0.03, 'shed'));
+  g.add(mesh(geo, trim));
+  g.add(box(-0.5, 0.05, z1, -0.01, 1.75, z1 + 0.02, trim), box(0.01, 0.05, z1, 0.5, 1.75, z1 + 0.02, trim));
+  for (const x of [-0.42, -0.25, 0.09, 0.26]) g.add(box(x, 0.12, z1 + 0.02, x + 0.12, 1.68, z1 + 0.03, body));
   return g;
 }
 
@@ -1236,5 +1237,64 @@ export function gardenStudio(w, d, o = {}) {
     g.add(box(a, 1.12, z1, a + ww, 1.94, z1 + 0.03, trim));
     g.add(box(a + 0.05, 1.17, z1 + 0.03, a + ww - 0.05, 1.89, z1 + 0.035, 'blackGlass'));
   }
+  return g;
+}
+
+// Bunded plastic heating-oil tank.
+export function oilTank(w, d, o = {}) {
+  const { h = 1.6, c = '#3f6a3a' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, h - 0.08, z1, c));
+  g.add(box(x0 + 0.04, h - 0.08, z0 + 0.04, x1 - 0.04, h, z1 - 0.04, c));
+  g.add(cyl(x0 + 0.3, h, 0, 0.12, 0.06, '#2e4f2b'));
+  for (let i = 1; i < 4; i++) g.add(box(x0 - 0.005, 0.2 + i * 0.32, z0, x1 + 0.005, 0.22 + i * 0.32, z1, '#36603a'));
+  return g;
+}
+
+// Floor-standing oil boiler.
+export function oilBoiler(w, d) {
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 0.86, z1, 'gloss'));
+  g.add(box(x0 + 0.06, 0.62, z1, x1 - 0.06, 0.8, z1 + 0.005, '#3a3f45'));
+  g.add(box(x0 + 0.1, 0.68, z1 + 0.005, x0 + 0.22, 0.74, z1 + 0.008, '#58c27d'));
+  for (const dx of [0.12, 0.22, 0.32]) g.add(rod([x0 + dx, 0.86, z0 + 0.1], [x0 + dx, 2.2, z0 + 0.1], 0.012, '#c98a52'));
+  g.add(cyl(x1 - 0.15, 0.86, z0 + 0.15, 0.06, 1.4, 'steel'));
+  return g;
+}
+
+// Single sofa-style lounger for the deck.
+export function lounger(w, d, o = {}) {
+  const { c = '#8a6a48', cushion = '#e6e0d4' } = o;
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  for (const [x, z] of [[x0 + 0.05, z0 + 0.05], [x1 - 0.09, z0 + 0.05], [x0 + 0.05, z1 - 0.09], [x1 - 0.09, z1 - 0.09]]) g.add(box(x, 0, z, x + 0.04, 0.25, z + 0.04, c));
+  g.add(box(x0, 0.25, z0, x1, 0.32, z1, c));
+  g.add(box(x0 + 0.03, 0.32, z0 + 0.03, x1 - 0.03, 0.4, z1 - 0.03, cushion));
+  const back = box(x0 + 0.03, 0, -0.03, x1 - 0.03, 0.62, 0.05, cushion);
+  back.position.set(0, 0.38, z0 + 0.1);
+  back.rotation.x = -0.5;
+  g.add(back);
+  return g;
+}
+
+// Integrated gas hob set into a worktop.
+export function hob(w, d) {
+  const g = new THREE.Group();
+  g.add(box(-w / 2, 0, -d / 2, w / 2, 0.012, d / 2, 'blackGlass'));
+  for (const [x, z, r] of [[-w / 4, -d / 4, 0.055], [w / 4, -d / 4, 0.045], [-w / 4, d / 4, 0.045], [w / 4, d / 4, 0.065], [0, 0, 0.035]]) {
+    g.add(cyl(x, 0.012, z, r, 0.018, '#2c2f33', 14));
+    g.add(cyl(x, 0.03, z, r * 0.45, 0.008, 'steel', 10));
+  }
+  return g;
+}
+
+// Square shower enclosure: low tray, two glass sides and a riser rail.
+export function showerCubicle(w, d) {
+  const { g, x0, x1, z0, z1 } = frame(w, d);
+  g.add(box(x0, 0, z0, x1, 0.06, z1, 'porcelain'));
+  g.add(box(x0, 0.06, z1 - 0.012, x1, 1.95, z1, 'glass'));
+  g.add(box(x0, 0.06, z0, x0 + 0.012, 1.95, z1, 'glass'));
+  g.add(box(x0, 1.93, z1 - 0.02, x1, 1.96, z1, 'chrome'));
+  g.add(rod([x1 - 0.06, 0.9, z0 + 0.04], [x1 - 0.06, 2.0, z0 + 0.04], 0.012, 'chrome'));
+  g.add(cyl(x1 - 0.06, 1.75, z0 + 0.09, 0.035, 0.12, 'chrome'));
   return g;
 }

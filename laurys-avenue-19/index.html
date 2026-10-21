@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>19 Laurys Avenue 3D Tour</title>
+  <meta name="claude:viewport-fit-sides" content="cover" />
+  <meta name="description" content="Interactive isometric 3D model of 19 Laurys Avenue, Ramsey: a detached bungalow, its garden and every room, reasoned from the listing description." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="../tour-kit/tour.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="masthead">
+      <div class="masthead-id">
+        <h1 id="prop-name">19 Laurys Avenue</h1>
+        <p id="prop-place">Ramsey, Isle of Man IM8 2HE</p>
+      </div>
+      <ul class="masthead-facts" id="prop-facts" aria-label="Key facts"></ul>
+      <div class="masthead-source">
+        <span class="price" id="prop-price">£319,950</span>
+        <a id="prop-source" href="https://www.zoopla.co.uk/property-history/19-laurys-avenue/ramsey/isle-of-man/im8-2he/65070128/" target="_blank" rel="noopener">Listing history ↗</a>
+        <span class="masthead-related" id="prop-related" hidden></span>
+      </div>
+    </header>
+
+    <nav class="scenes" aria-label="Scenes">
+      <ul id="scene-list"></ul>
+      <div class="scenes-foot">
+        <h2>How to read the model</h2>
+        <ul class="legend" id="legend"></ul>
+        <p>An unofficial model built from the listing description only: its floor plan and photos were not available. The rooms and how they connect follow the description, but the layout, sizes, finishes and furniture are a reasoned guess.</p>
+      </div>
+    </nav>
+
+    <main class="stage" id="stage">
+      <div class="canvas" id="canvas" tabindex="0" role="img" aria-label="Interactive 3D model. Drag to orbit, scroll or pinch to zoom, right-drag to pan. Left and right arrow keys rotate the view."></div>
+      <div class="labels" id="labels"></div>
+
+      <div class="toolbar" role="toolbar" aria-label="View controls">
+        <div class="tool-group">
+          <button type="button" class="tool" id="rot-left" title="Rotate left 90°" aria-label="Rotate left 90 degrees">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v4h4" /></svg>
+          </button>
+          <button type="button" class="tool" id="rot-right" title="Rotate right 90°" aria-label="Rotate right 90 degrees">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7" /><path d="M20 4v4h-4" /></svg>
+          </button>
+          <button type="button" class="tool" id="zoom-in" title="Zoom in" aria-label="Zoom in">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+          <button type="button" class="tool" id="zoom-out" title="Zoom out" aria-label="Zoom out">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+          </button>
+          <button type="button" class="tool" id="reset" title="Reset view" aria-label="Reset view">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M4 15v5h5M20 9V4h-5" /></svg>
+          </button>
+        </div>
+        <div class="tool-group segmented" id="walls" role="group" aria-label="Walls">
+          <button type="button" data-mode="cutaway" aria-pressed="true" title="Lower the walls nearest to you">Cutaway</button>
+          <button type="button" data-mode="full" aria-pressed="false" title="Show every wall at full height">Full</button>
+          <button type="button" data-mode="low" aria-pressed="false" title="Cut every wall down to a plan view">Low</button>
+        </div>
+        <div class="tool-group">
+          <button type="button" class="tool tool-text" id="labels-toggle" aria-pressed="true">Labels</button>
+        </div>
+      </div>
+
+      <div class="pager">
+        <button type="button" class="tool" id="prev" aria-label="Previous scene">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+        </button>
+        <div class="pager-text" aria-live="polite">
+          <span id="pager-title">Front &amp; driveway</span>
+          <span class="mono" id="pager-count">1 / 14</span>
+        </div>
+        <button type="button" class="tool" id="next" aria-label="Next scene">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+
+      <p class="hint">Drag to orbit · scroll to zoom · right-drag to pan · hover or tap anything</p>
+      <div class="tip" id="tip" hidden></div>
+      <div class="loading" id="loading">Building the model…</div>
+    </main>
+
+    <aside class="details" id="details" aria-live="polite"></aside>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

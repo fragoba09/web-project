@@ -414,6 +414,27 @@ const DEF = {
   fenceWeathered: { tex: () => TEX.boards({ base: '#a0968a', n: 7, seed: 64 }) },
   pinkVelvet: { color: '#d9a7a6', rough: 0.95 },
 
+  // 19 Laurys Avenue: white-rendered bungalow, sun room, raised deck
+  renderWhite: { tex: () => TEX.speck({ base: '#ebe9e3', colors: ['#dedbd4', '#f3f1ec', '#d6d3cb'], size: 0.8, n: 9000, seed: 66 }) },
+  stoneWall: { tex: () => TEX.flags({ base: '#a99a86', size: 1.2, seed: 67 }), rough: 1 },
+  stoneBreast: { tex: () => TEX.flags({ base: '#b8ab98', size: 0.9, seed: 68 }), rough: 1 },
+  slate: { color: '#3c4046', rough: 0.6 },
+  sunTile: { tex: () => TEX.tiles({ base: '#d8d3ca', grout: '#c3bdb2', tw: 0.6, th: 0.6, size: 1.2, vary: 0.04, seed: 69 }), rough: 0.4 },
+  deck: { tex: () => TEX.planks({ base: '#8c6c4c', size: 1.4, w: 0.14, vary: 0.1, seed: 70 }), rough: 0.9 },
+  kitchenGrey: { color: '#7f878e', rough: 0.35 },
+  kitchenGreyPanel: { color: '#788087', rough: 0.35 },
+  quartz: { color: '#eeeeeb', rough: 0.25 },
+  sunRoof: { color: '#d7dadd', rough: 0.5 },
+  compositeDoor: { color: '#4b5866', rough: 0.4 },
+  lounge19: { color: '#e5dfd5' },
+  hall19: { color: '#ebe7df' },
+  kitchen19: { color: '#eef0ee' },
+  sun19: { color: '#f4f2ed' },
+  bed1w19: { color: '#dde2e6' },
+  bed2w19: { color: '#e8e2d6' },
+  bed3w19: { color: '#dee6da' },
+  utility19: { color: '#efeeea' },
+
   // furnishings
   white: { color: '#f3f2ee' },
   gloss: { color: '#f7f7f5', rough: 0.25 },
