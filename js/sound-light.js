@@ -15,6 +15,7 @@
   const MPH = 2.23694; // m/s to mph
   const GROUND = D.site.ground; // café terrace, metres above sea level
   const RANGE = [360, 1140]; // scrubber: 06:00 to 19:00
+  const EMBEDDED = window.top !== window.self; // framed viewers (like Claude's) don't allow live requests
 
   const $ = (id) => document.getElementById(id);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -1146,11 +1147,12 @@
       return `${dayLabel(c.day)} ${hm(c.min)}`;
     };
     $("source").innerHTML = `<span>Forecast: ${esc(FC_META.source)}, issued ${fmt(FC_META.updated)}${FC_META.live ? ", fetched live" : `, saved ${fmt(FC_META.fetched)}`}.</span>
-      <button class="btn" id="refresh" type="button">Check for a newer forecast</button>
+      ${EMBEDDED ? "<span>Live updates don't run inside this viewer.</span>" : '<button class="btn" id="refresh" type="button">Check for a newer forecast</button>'}
       <a href="https://www.windy.com/54.064/-4.792?clouds,54.064,-4.792,10" target="_blank" rel="noopener">Cloud map on Windy</a>
       <a href="https://www.gov.im/weather/" target="_blank" rel="noopener">Isle of Man forecast</a>
       ${FC_META.note ? `<span class="warnline">${esc(FC_META.note)}</span>` : ""}`;
-    $("refresh").addEventListener("click", () => refreshForecast(true));
+    const btn = $("refresh");
+    if (btn) btn.addEventListener("click", () => refreshForecast(true));
   }
 
   // ---------------------------------------------------------------- lens guide and plan
@@ -1273,7 +1275,7 @@
       renderTimeDependent();
     } catch (err) {
       FC_META.note = manual
-        ? "Couldn't reach MET Norway. Inside Claude's viewer the page can't load live data; elsewhere, check your connection. The saved forecast above still applies, and the links show the latest."
+        ? "Couldn't reach MET Norway. Check your connection; the saved forecast above still applies, and the links show the latest."
         : "";
       renderSource();
     }
@@ -1442,7 +1444,7 @@
     }
     bind();
     renderAll();
-    if (window.top === window.self && navigator.onLine !== false) refreshForecast(false);
+    if (!EMBEDDED && navigator.onLine !== false) refreshForecast(false);
   }
 
   // exposed for checking the maths outside the page
