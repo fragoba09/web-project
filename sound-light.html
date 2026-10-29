@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Light at the Sound</title>
+  <meta name="claude:viewport-fit-sides" content="cover" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/sound-light.css" />
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="masthead__text">
+      <p class="eyebrow"><span id="day-label">Friday 30 October 2026</span> · clock time GMT</p>
+      <h1>Light at the Sound</h1>
+      <p class="lede">The café looks south-west across Calf Sound to the Calf of Man, which is where the late-October sun goes down. Scrub through the day to see where the light falls, what the sky is doing, and which lens frames it.</p>
+      <div class="seg" id="days" aria-label="Day"></div>
+    </div>
+    <div class="place">
+      <p class="label">Location</p>
+      <p class="place__name">The Sound Café <small>(Calf Sound Cafe on OpenStreetMap)</small></p>
+      <p class="place__coords">
+        <span class="num" id="coords">54.06398° N, 4.79239° W</span>
+        <button class="btn" id="copy-coords" type="button">Copy</button>
+      </p>
+      <p><span class="num muted">54°03′50.3″N 4°47′32.6″W</span></p>
+      <p class="place__links">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=54.063977%2C-4.792391" target="_blank" rel="noopener">Google Maps</a>
+        <a href="https://maps.apple.com/?ll=54.063977,-4.792391&amp;q=The%20Sound%20Caf%C3%A9" target="_blank" rel="noopener">Apple Maps</a>
+        <a href="https://www.openstreetmap.org/way/87988780" target="_blank" rel="noopener">OpenStreetMap</a>
+      </p>
+      <small>Sound Road, Cregneash IM9 5PZ · open <span id="hours">10:00–17:00</span> · 01624 838123</small>
+    </div>
+  </header>
+
+  <section class="keys" id="keys" aria-label="Key times"></section>
+  <div class="verdict" id="verdict"></div>
+
+  <div class="scrubber" id="scrubber">
+    <div class="readout" id="readout" aria-live="polite"></div>
+    <div class="track">
+      <div class="track__bar" id="track-bar"></div>
+      <div class="track__ticks" id="track-ticks"></div>
+      <input type="range" id="time" min="360" max="1140" step="1" value="955" aria-label="Time of day" />
+    </div>
+    <div class="track__hours" id="track-hours" aria-hidden="true"></div>
+    <div class="jumps" id="jumps"></div>
+  </div>
+
+  <main class="layout">
+    <div class="col">
+      <section class="panel" id="map-panel" aria-labelledby="map-title">
+        <div class="panel__head">
+          <h2 id="map-title">Sun over the Sound</h2>
+          <div class="seg" id="views">
+            <button class="btn" type="button" data-view="site">Headland</button>
+            <button class="btn" type="button" data-view="sound">Sound &amp; Calf</button>
+          </div>
+        </div>
+        <div class="figure"><svg class="map" id="map" role="img" aria-label="Map of the Sound with the sun direction, camera and couple positions"></svg></div>
+        <div class="map-tools">
+          <span class="label">Tap the map to place</span>
+          <div class="seg" id="placing">
+            <button class="btn" type="button" data-placing="couple">The two of you</button>
+            <button class="btn" type="button" data-placing="camera">Camera</button>
+          </div>
+          <label class="sr-only" for="preset">Suggested set-ups</label>
+          <select id="preset"></select>
+        </div>
+        <p class="warnline" id="map-warn"></p>
+        <p class="map-readout" id="map-readout"></p>
+      </section>
+
+      <section class="panel" id="lens-panel" aria-labelledby="lens-title">
+        <div class="panel__head">
+          <h2 id="lens-title">Through the lens</h2>
+          <p class="label">Schematic preview</p>
+        </div>
+        <div class="figure"><svg class="viewfinder" id="viewfinder" role="img" aria-label="Preview of the frame with the couple, the Calf of Man and the sun"></svg></div>
+        <div class="lens-controls">
+          <div class="field">
+            <label class="label" for="sys">Camera</label>
+            <select id="sys"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="fnum">Aperture</label>
+            <select id="fnum"></select>
+          </div>
+          <div class="field field--wide">
+            <label class="label" for="focal">Focal length</label>
+            <div class="focal-row">
+              <input type="range" id="focal" min="0" max="1000" step="1" />
+              <output id="focal-out" for="focal"></output>
+            </div>
+            <div class="chips" id="focal-chips"></div>
+          </div>
+          <div class="field">
+            <label class="label" for="camh">Camera height</label>
+            <select id="camh">
+              <option value="1.6">Eye level · 1.6 m</option>
+              <option value="1.2">Chest · 1.2 m</option>
+              <option value="0.8">Crouched · 0.8 m</option>
+              <option value="0.3">Low · 0.3 m</option>
+            </select>
+          </div>
+          <div class="field">
+            <span class="label">Frame &amp; pose</span>
+            <div class="seg">
+              <button class="btn" type="button" id="orient">Landscape</button>
+              <button class="btn" type="button" id="pose">One kneeling</button>
+            </div>
+          </div>
+        </div>
+        <dl class="stats" id="stats"></dl>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel" id="light-panel" aria-labelledby="light-title">
+        <div class="panel__head">
+          <h2 id="light-title">The day's light</h2>
+        </div>
+        <p class="panel__note" id="light-note"></p>
+        <div class="figure"><svg class="chart" id="sunpath" role="img" aria-label="Sun path across the sky against the skyline seen from the café"></svg></div>
+        <p class="chart-key" id="sunpath-key"></p>
+        <div class="table-wrap"><table class="times" id="times"></table></div>
+      </section>
+
+      <section class="panel" id="sky-panel" aria-labelledby="sky-title">
+        <div class="panel__head">
+          <h2 id="sky-title">Cloud and weather</h2>
+        </div>
+        <ul class="outlook" id="outlook"></ul>
+        <div class="figure"><svg class="chart" id="wx" role="img" aria-label="Hourly cloud layers, wind and temperature"></svg></div>
+        <h3>Along the sunbeam</h3>
+        <p class="panel__note" id="beam-note"></p>
+        <div class="figure"><svg class="chart" id="beam" role="img" aria-label="Cross-section of cloud layers between the café and the setting sun"></svg></div>
+        <div class="source" id="source"></div>
+      </section>
+
+      <section class="panel" id="guide-panel" aria-labelledby="guide-title">
+        <div class="panel__head">
+          <h2 id="guide-title">Lens for each shot</h2>
+          <p class="label" id="guide-sys"></p>
+        </div>
+        <div class="shots" id="shots"></div>
+      </section>
+
+      <section class="panel" id="plan-panel" aria-labelledby="plan-title">
+        <div class="panel__head">
+          <h2 id="plan-title">Shot plan</h2>
+          <p class="label">Ticks are saved on this device</p>
+        </div>
+        <div class="plan" id="plan"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>Sun positions use the NOAA solar algorithm with atmospheric refraction, checked against MET Norway's published sunrise (07:15) and sunset (16:48) for the café. The skyline comes from terrain tiles (EU-DEM/SRTM), which smooth the Calf's 126 m summit by about 10 m, so the sun may disappear a minute or two earlier than shown.</p>
+    <p>Map: © OpenStreetMap contributors (ODbL). Forecast: MET Norway Locationforecast (CC BY 4.0), with a second opinion from 7Timer (NOAA GFS). Exposure and cloud-impact figures are starting points, not measurements.</p>
+  </footer>
+</div>
+
+<script src="js/sound-data.js"></script>
+<script src="js/sound-light.js"></script>
+</body>
+</html>
